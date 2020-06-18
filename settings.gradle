@@ -1,0 +1,3 @@
+include ':FaceLibrary'
+include ':app'
+rootProject.name = "face_mnn"
