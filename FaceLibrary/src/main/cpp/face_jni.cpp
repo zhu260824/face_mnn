@@ -67,6 +67,7 @@ Java_com_zl_face_FaceDetector_detectYuv(JNIEnv *env, jobject thiz,
     cv::Mat mBgr;
     cvtColor(image, mBgr, CV_YUV2BGR_NV21);
     std::vector<FaceInfo> face_info = detector->detect(mBgr);
+    env->DeleteLocalRef(yuv);
     int32_t num_face = static_cast<int32_t>(face_info.size());
     LOGD("检测到的人脸数目：%d\n", num_face);
     jclass faceClass = env->FindClass("com/zl/face/FaceInfo");
@@ -95,6 +96,8 @@ Java_com_zl_face_FaceDetector_detectYuv(JNIEnv *env, jobject thiz,
         (env)->SetObjectField(newFace, faceRect, newRect);
         (env)->SetFloatField(newFace, faceScore, score);
         (env)->SetObjectArrayElement(faceArgs, i, newFace);
+        env->DeleteLocalRef(newFace);
+        env->DeleteLocalRef(newRect);
     }
     return faceArgs;
 }
@@ -135,6 +138,7 @@ Java_com_zl_face_FaceDetector_detectIRYuv(JNIEnv *env, jobject thiz, jbyteArray 
     cv::Mat mBgr;
     cvtColor(image, mBgr, CV_YUV2BGR_NV21);
     std::vector<FaceInfo> face_info = irDetector->detect(mBgr);
+    env->DeleteLocalRef(yuv);
     int32_t num_face = static_cast<int32_t>(face_info.size());
     LOGD("IR-->检测到的人脸数目：%d\n", num_face);
     jclass faceClass = env->FindClass("com/zl/face/FaceInfo");
@@ -163,6 +167,8 @@ Java_com_zl_face_FaceDetector_detectIRYuv(JNIEnv *env, jobject thiz, jbyteArray 
         (env)->SetObjectField(newFace, faceRect, newRect);
         (env)->SetFloatField(newFace, faceScore, score);
         (env)->SetObjectArrayElement(faceArgs, i, newFace);
+        env->DeleteLocalRef(newFace);
+        env->DeleteLocalRef(newRect);
     }
     return faceArgs;
 }

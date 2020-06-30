@@ -1,6 +1,8 @@
 package com.zl.demo;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
@@ -10,7 +12,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.zl.demo.util.ImageUtil;
 import com.zl.face.FaceDetector;
@@ -97,12 +102,17 @@ public class MainActivity extends AppCompatActivity {
 //                tvT4.setText("比对结果：" + smaile);
             }
         });
-        detector = new FaceDetector();
-        boolean init = detector.init(this);
-        Log.i("canshu", "init result:" + init);
-        ImageUtil.copyImage2SD(this, imgPath);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (checkPermission()) {
+            activate();
+        } else {
+            requestPermission();
+        }
+    }
 
     private String detect(Context mContext, String assetsPath, ImageView imageView) {
         String msg = "";
@@ -123,5 +133,53 @@ public class MainActivity extends AppCompatActivity {
 //        imageView.post(() -> imageView.setImageBitmap(cb));
         return msg;
     }
+
+    public void activate() {
+        detector = new FaceDetector();
+        boolean init = detector.init(this);
+        Log.i("canshu", "init result:" + init);
+        ImageUtil.copyImage2SD(this, imgPath);
+    }
+
+
+    private boolean checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+        return true;
+    }
+
+    private void requestPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
+            return;
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 2);
+            return;
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults.length != 0) {
+            if (checkPermission()) {
+                activate();
+            } else {
+                requestPermission();
+            }
+        }
+    }
+
 
 }
