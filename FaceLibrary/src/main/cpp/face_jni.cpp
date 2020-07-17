@@ -58,6 +58,30 @@ Java_com_zl_face_FaceDetector_detectFile(JNIEnv *env, jobject thiz, jstring img_
 }
 
 extern "C"
+JNIEXPORT jfloatArray JNICALL
+Java_com_zl_face_FaceDetector_detectPic(JNIEnv *env, jobject thiz, jstring img_path) {
+    jfloatArray faceInfos = nullptr;
+    const char *imgPath = env->GetStringUTFChars(img_path, 0);
+    cv::Mat cv_img = cv::imread(imgPath);
+    std::vector<FaceInfo> face_info = detector->detect(cv_img);
+    int32_t num_face = static_cast<int32_t>(face_info.size());
+    LOGD("检测到的人脸数目：%d\n", num_face);
+    int faceSize = num_face * 5;
+    float *faces = new float[faceSize];
+    for (int i = 0; i < num_face; i++) {
+        int startIndex = i * 5;
+        faces[startIndex] = face_info[i].x1;
+        faces[startIndex + 1] = face_info[i].y1;
+        faces[startIndex + 2] = face_info[i].x2;
+        faces[startIndex + 3] = face_info[i].y2;
+        faces[startIndex + 4] = face_info[i].score;
+    }
+    faceInfos = env->NewFloatArray(faceSize);
+    env->SetFloatArrayRegion(faceInfos, 0, faceSize, faces);
+    return faceInfos;
+}
+
+extern "C"
 JNIEXPORT jobjectArray JNICALL
 Java_com_zl_face_FaceDetector_detectYuv(JNIEnv *env, jobject thiz,
                                         jbyteArray yuv, jint width, jint height) {
@@ -99,6 +123,34 @@ Java_com_zl_face_FaceDetector_detectYuv(JNIEnv *env, jobject thiz,
         env->DeleteLocalRef(newFace);
         env->DeleteLocalRef(newRect);
     }
+    return faceArgs;
+}
+
+extern "C"
+JNIEXPORT jfloatArray JNICALL
+Java_com_zl_face_FaceDetector_detectYUV(JNIEnv *env, jobject thiz,
+                                        jbyteArray yuv, jint width, jint height) {
+    jfloatArray faceArgs = nullptr;
+    jbyte *pBuf = (jbyte *) env->GetByteArrayElements(yuv, 0);
+    cv::Mat image = cv::Mat(height + height / 2, width, CV_8UC1, (unsigned char *) pBuf);
+    cv::Mat mBgr;
+    cvtColor(image, mBgr, CV_YUV2BGR_NV21);
+    std::vector<FaceInfo> face_info = detector->detect(mBgr);
+    env->DeleteLocalRef(yuv);
+    int32_t num_face = static_cast<int32_t>(face_info.size());
+    LOGD("检测到的人脸数目：%d\n", num_face);
+    int faceSize = num_face * 5;
+    float *faces = new float[faceSize];
+    for (int i = 0; i < num_face; i++) {
+        int startIndex = i * 5;
+        faces[startIndex] = face_info[i].x1;
+        faces[startIndex + 1] = face_info[i].y1;
+        faces[startIndex + 2] = face_info[i].x2;
+        faces[startIndex + 3] = face_info[i].y2;
+        faces[startIndex + 4] = face_info[i].score;
+    }
+    faceArgs = env->NewFloatArray(faceSize);
+    env->SetFloatArrayRegion(faceArgs, 0, faceSize, faces);
     return faceArgs;
 }
 
@@ -170,5 +222,33 @@ Java_com_zl_face_FaceDetector_detectIRYuv(JNIEnv *env, jobject thiz, jbyteArray 
         env->DeleteLocalRef(newFace);
         env->DeleteLocalRef(newRect);
     }
+    return faceArgs;
+}
+
+extern "C"
+JNIEXPORT jfloatArray JNICALL
+Java_com_zl_face_FaceDetector_detectIRYUV(JNIEnv *env, jobject thiz,
+                                          jbyteArray yuv, jint width, jint height) {
+    jfloatArray faceArgs = nullptr;
+    jbyte *pBuf = (jbyte *) env->GetByteArrayElements(yuv, 0);
+    cv::Mat image = cv::Mat(height + height / 2, width, CV_8UC1, (unsigned char *) pBuf);
+    cv::Mat mBgr;
+    cvtColor(image, mBgr, CV_YUV2BGR_NV21);
+    std::vector<FaceInfo> face_info = irDetector->detect(mBgr);
+    env->DeleteLocalRef(yuv);
+    int32_t num_face = static_cast<int32_t>(face_info.size());
+    LOGD("IR-->检测到的人脸数目：%d\n", num_face);
+    int faceSize = num_face * 5;
+    float *faces = new float[faceSize];
+    for (int i = 0; i < num_face; i++) {
+        int startIndex = i * 5;
+        faces[startIndex] = face_info[i].x1;
+        faces[startIndex + 1] = face_info[i].y1;
+        faces[startIndex + 2] = face_info[i].x2;
+        faces[startIndex + 3] = face_info[i].y2;
+        faces[startIndex + 4] = face_info[i].score;
+    }
+    faceArgs = env->NewFloatArray(faceSize);
+    env->SetFloatArrayRegion(faceArgs, 0, faceSize, faces);
     return faceArgs;
 }

@@ -67,7 +67,7 @@ Android 人脸检测和识别
         * @param height 帧的高度
         * @deprecated 使用这个方法，需要将摄像图帧旋转至0度
         */
-        public native FaceInfo[] detectYuv(byte[] yuv, int width, int height);
+        public native List<FaceInfo> detectYuvImg(byte[] yuv, int width, int height);
         ```
 - 根据使用设备减少so包，缩小apk大小
     ```

@@ -8,14 +8,13 @@ android {
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-//        ndkVersion "16.1.4479499"
         versionCode 1
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_TOOLCHAIN=clang", "-DANDROID_STL=c++_shared", "-DANDROID_PLATFORM=android-24"
+                arguments "-DANDROID_TOOLCHAIN=clang", "-DANDROID_STL=c++_shared", "-DANDROID_PLATFORM=android-19"
                 abiFilters "armeabi-v7a", "arm64-v8a"
             }
         }

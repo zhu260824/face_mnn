@@ -19,7 +19,6 @@ import androidx.core.content.ContextCompat;
 
 import com.zl.demo.util.ImageUtil;
 import com.zl.face.FaceDetector;
-import com.zl.face.FaceInfo;
 
 import java.io.File;
 import java.util.Arrays;
@@ -102,16 +101,17 @@ public class MainActivity extends AppCompatActivity {
 //                tvT4.setText("比对结果：" + smaile);
             }
         });
+        activate();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (checkPermission()) {
+//        if (checkPermission()) {
             activate();
-        } else {
-            requestPermission();
-        }
+//        } else {
+//            requestPermission();
+//        }
     }
 
     private String detect(Context mContext, String assetsPath, ImageView imageView) {
@@ -120,7 +120,11 @@ public class MainActivity extends AppCompatActivity {
         msg = msg + "image size = " + bitmap.getWidth() + "x" + bitmap.getHeight() + "\n";
         long startTime = System.currentTimeMillis();
 //        FaceInfo[] faces = detector.detectBitmap(bitmap);
-        FaceInfo[] faces = detector.detectFile(imgPath + File.separator + assetsPath);
+//        FaceInfo[] faces = detector.detectFile(imgPath + File.separator + assetsPath);
+//        Log.i("canshu", "耗时：" + (System.currentTimeMillis() - startTime));
+//        Log.i("canshu", Arrays.toString(faces));
+
+        float[] faces = detector.detectPic(imgPath + File.separator + assetsPath);
         Log.i("canshu", "耗时：" + (System.currentTimeMillis() - startTime));
         Log.i("canshu", Arrays.toString(faces));
 //        List<Face> faces = hyper.getTrackingInfo();
